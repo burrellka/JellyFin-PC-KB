@@ -1,0 +1,94 @@
+name: build-and-release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore plugins/ParentGuard/src/ParentGuard/ParentGuard.csproj
+
+      - name: Build Release
+        run: dotnet build -c Release plugins/ParentGuard/src/ParentGuard/ParentGuard.csproj
+
+      - name: Stage package
+        run: |
+          OUT=plugins/ParentGuard/src/ParentGuard/bin/Release/net8.0
+          mkdir -p dist
+          cp $OUT/Jellyfin.Plugin.ParentGuard.dll dist/
+          cp plugins/ParentGuard/src/ParentGuard/manifest.json dist/
+          cd dist
+          zip -r ParentGuard.zip .
+
+      - name: Compute checksum and update repository.json
+        run: |
+          set -e
+          TAG=${GITHUB_REF_NAME}
+          VERSION=${TAG#v}
+          ZIP_PATH=dist/ParentGuard.zip
+          CHECKSUM=$(sha256sum "$ZIP_PATH" | awk '{print $1}')
+          TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          SRC_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/ParentGuard.zip"
+          # Create updated repository.json in dist/
+          jq \
+            --arg ver "$VERSION" \
+            --arg url "$SRC_URL" \
+            --arg sum "$CHECKSUM" \
+            --arg ts "$TS" \
+            '.packages[0].versions[0].version=$ver | .packages[0].versions[0].sourceUrl=$url | .packages[0].versions[0].checksum=$sum | .packages[0].versions[0].timestamp=$ts' \
+            plugins/ParentGuard/repository.json > dist/repository.json
+
+      - name: Commit repository.json back to main
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          cp dist/repository.json plugins/ParentGuard/repository.json
+          git add plugins/ParentGuard/repository.json
+          git commit -m "chore(release): update repository.json for ${GITHUB_REF_NAME}" || echo "No changes to commit"
+          git push origin HEAD:main
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ParentGuard-zip
+          path: dist/ParentGuard.zip
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ParentGuard-zip
+          path: dist
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/ParentGuard.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+

@@ -1,0 +1,92 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\dev\\JellyFin-PC-KB\\JellyFin-PC-KB\\plugins\\ParentGuard\\src\\ParentGuard\\ParentGuard.csproj": {}
+  },
+  "projects": {
+    "C:\\dev\\JellyFin-PC-KB\\JellyFin-PC-KB\\plugins\\ParentGuard\\src\\ParentGuard\\ParentGuard.csproj": {
+      "version": "0.1.0",
+      "restore": {
+        "projectUniqueName": "C:\\dev\\JellyFin-PC-KB\\JellyFin-PC-KB\\plugins\\ParentGuard\\src\\ParentGuard\\ParentGuard.csproj",
+        "projectName": "Jellyfin.Plugin.ParentGuard",
+        "projectPath": "C:\\dev\\JellyFin-PC-KB\\JellyFin-PC-KB\\plugins\\ParentGuard\\src\\ParentGuard\\ParentGuard.csproj",
+        "packagesPath": "C:\\Users\\Kevin\\.nuget\\packages\\",
+        "outputPath": "C:\\dev\\JellyFin-PC-KB\\JellyFin-PC-KB\\plugins\\ParentGuard\\src\\ParentGuard\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Kevin\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Jellyfin.Common": {
+              "target": "Package",
+              "version": "[10.10.0, )"
+            },
+            "Jellyfin.Controller": {
+              "target": "Package",
+              "version": "[10.10.0, )"
+            },
+            "Jellyfin.Model": {
+              "target": "Package",
+              "version": "[10.10.0, )"
+            },
+            "Microsoft.AspNetCore.Authorization": {
+              "target": "Package",
+              "version": "[2.2.0, )"
+            },
+            "Microsoft.AspNetCore.Mvc.Core": {
+              "target": "Package",
+              "version": "[2.2.5, )"
+            },
+            "Microsoft.Extensions.Hosting.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.413/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

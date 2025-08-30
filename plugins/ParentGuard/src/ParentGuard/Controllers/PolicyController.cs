@@ -1,0 +1,59 @@
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Jellyfin.Plugin.ParentGuard.Controllers
+{
+    [ApiController]
+    [Route("ParentGuard/policy")] 
+    [Authorize(Policy = "RequiresElevation")] // admin only
+    public class PolicyController : ControllerBase
+    {
+        private readonly Plugin _plugin;
+        public PolicyController(Plugin plugin)
+        {
+            _plugin = plugin;
+        }
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            return Ok(_plugin.Configuration);
+        }
+
+        [HttpPut("{userId}")]
+        public IActionResult Upsert(string userId, [FromBody] ProfilePolicy policy)
+        {
+            _plugin.Configuration.Profiles[userId] = policy;
+            _plugin.Save();
+            return Ok(policy);
+        }
+
+        [HttpPut("admins")] 
+        public IActionResult SetAdmins([FromBody] Dictionary<string, AdminUser> admins)
+        {
+            _plugin.Configuration.Admins = admins;
+            _plugin.Save();
+            return Ok(admins);
+        }
+
+        public record SeedBody(List<string> admins, List<string> profiles);
+
+        [HttpPost("seed")] 
+        public IActionResult Seed([FromBody] SeedBody body)
+        {
+            foreach (var a in body.admins)
+            {
+                _plugin.Configuration.Admins[a] = new AdminUser { CanApprove = true };
+            }
+            foreach (var p in body.profiles)
+            {
+                _plugin.Configuration.Profiles[p] = Defaults.CreateDefaultPolicy();
+            }
+            _plugin.Save();
+            return Ok(new { admins = body.admins, profiles = body.profiles });
+        }
+    }
+}
+
+

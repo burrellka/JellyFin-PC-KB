@@ -1,0 +1,28 @@
+{
+  "name": "ParentGuard Repository",
+  "guid": "b1f2d0a1-5c0d-4bfa-9b70-9f0a2d3f9c10",
+  "maintainer": "burrellka",
+  "url": "https://raw.githubusercontent.com/burrellka/JellyFin-PC-KB/main/plugins/ParentGuard/repository.json",
+  "version": 1,
+  "packages": [
+    {
+      "name": "ParentGuard",
+      "overview": "Server-side parental controls: schedules, budgets, rate limits, approvals.",
+      "description": "A plugin to help parents manage screen time and behavior for kids.",
+      "owner": "ParentGuard",
+      "category": "General",
+      "guid": "d5b86f5a-6a4c-4f7c-9f7c-8f52594b8b51",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "targetAbi": "10.10.0.0",
+          "sourceUrl": "https://github.com/burrellka/JellyFin-PC-KB/releases/download/v0.1.0/ParentGuard.zip",
+          "checksum": "",
+          "timestamp": ""
+        }
+      ]
+    }
+  ]
+}
+
+

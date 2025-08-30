@@ -34,7 +34,11 @@ jobs:
           OUT=plugins/ParentGuard/src/ParentGuard/bin/Release/net8.0
           mkdir -p dist
           cp $OUT/Jellyfin.Plugin.ParentGuard.dll dist/
-          cp plugins/ParentGuard/src/ParentGuard/manifest.json dist/
+          # Copy manifest and set its version to the tag version
+          cp plugins/ParentGuard/src/ParentGuard/manifest.json dist/manifest.json
+          TAG=${GITHUB_REF_NAME}
+          VERSION=${TAG#v}
+          jq --arg ver "$VERSION" '.version=$ver' dist/manifest.json > dist/manifest.tmp && mv dist/manifest.tmp dist/manifest.json
           cd dist
           zip -r ParentGuard.zip .
 

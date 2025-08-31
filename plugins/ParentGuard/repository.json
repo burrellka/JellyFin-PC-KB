@@ -14,11 +14,11 @@
       "guid": "d5b86f5a-6a4c-4f7c-9f7c-8f52594b8b51",
       "versions": [
         {
-          "version": "0.1.5",
+          "version": "0.1.6",
           "targetAbi": "10.10.0.0",
-          "sourceUrl": "https://github.com/burrellka/JellyFin-PC-KB/releases/download/v0.1.5/ParentGuard.zip",
-          "checksum": "c29e243357e0ca598b3b839c51d3205933d4b2793ba9daa32bc1de1f7fec066f",
-          "timestamp": "2025-08-31T10:05:59Z"
+          "sourceUrl": "https://github.com/burrellka/JellyFin-PC-KB/releases/download/v0.1.6/ParentGuard.zip",
+          "checksum": "97a982cc2ebc219ff12ea02f1b3ec097c386231438867e6d0c01639241bdfbe1",
+          "timestamp": "2025-08-31T14:25:23Z"
         }
       ]
     }

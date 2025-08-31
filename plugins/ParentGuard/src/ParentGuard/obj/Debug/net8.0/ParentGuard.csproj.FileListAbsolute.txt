@@ -10,3 +10,4 @@ C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Deb
 C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Debug\net8.0\refint\Jellyfin.Plugin.ParentGuard.dll
 C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Debug\net8.0\Jellyfin.Plugin.ParentGuard.pdb
 C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Debug\net8.0\ref\Jellyfin.Plugin.ParentGuard.dll
+C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Debug\net8.0\ParentGuard.sourcelink.json

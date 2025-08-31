@@ -3,6 +3,7 @@ using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Serialization;
 using System.Collections.Generic;
+using MediaBrowser.Model.Plugins;
 
 namespace Jellyfin.Plugin.ParentGuard
 {
@@ -27,23 +28,24 @@ namespace Jellyfin.Plugin.ParentGuard
 
         public IEnumerable<PluginPageInfo> GetPages()
         {
-            var ns = GetType().Namespace;
             return new[]
             {
                 new PluginPageInfo
                 {
-                    Name = "parentguard",
-                    EmbeddedResourcePath = ns + ".Web.parentguard.html"
+                    Name = "ParentGuard",
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.parentguard.html",
                 },
                 new PluginPageInfo
                 {
                     Name = "parentguard.js",
-                    EmbeddedResourcePath = ns + ".Web.parentguard.js"
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.parentguard.js",
+                    EnableInMainMenu = false
                 },
                 new PluginPageInfo
                 {
                     Name = "parentguard.css",
-                    EmbeddedResourcePath = ns + ".Web.parentguard.css"
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.parentguard.css",
+                    EnableInMainMenu = false
                 }
             };
         }

@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Jellyfin.Plugin.ParentGuard</AssemblyName>
     <RootNamespace>Jellyfin.Plugin.ParentGuard</RootNamespace>
-    <Version>0.1.5</Version>
+    <Version>0.1.6</Version>
     <Authors>ParentGuard</Authors>
     <PackageId>Jellyfin.Plugin.ParentGuard</PackageId>
     <Description>Server-side parental controls for Jellyfin: schedules, budgets, rate limits, approvals.</Description>
@@ -18,6 +18,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Web\parentguard.html" />
+    <EmbeddedResource Include="Web\parentguard.js" />
+    <EmbeddedResource Include="Web\parentguard.css" />
   </ItemGroup>
 
   <ItemGroup>

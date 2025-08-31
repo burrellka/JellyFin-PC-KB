@@ -23,6 +23,22 @@
       <div style="margin-top:1rem;">
         <button id="pg-apply" class="raised button-submit">Apply Defaults</button>
       </div>
+      <hr/>
+      <div style="margin-top:1rem;">
+        <h3>Labels</h3>
+        <div>
+          <label>User</label>
+          <input id="pg-label-user" type="text" placeholder="username" />
+          <label style="margin-left:0.5rem;"><input type="checkbox" id="pg-label-approver"/> Approver</label>
+          <label style="margin-left:0.5rem;"><input type="checkbox" id="pg-label-child"/> Child</label>
+          <button id="pg-label-apply" class="raised button-submit" style="margin-left:0.5rem;">Apply Label</button>
+        </div>
+      </div>
+      <div style="margin-top:1rem;">
+        <h3>Approvals</h3>
+        <button id="pg-requests-refresh" class="raised">Refresh Requests</button>
+        <div id="pg-requests" style="margin-top:0.5rem;"></div>
+      </div>
       <div id="pg-status" style="margin-top:1rem;"></div>
     </div>`;
 
@@ -47,6 +63,55 @@
       document.getElementById('pg-status').textContent = 'Error applying defaults.';
     }
   });
+
+  document.getElementById('pg-label-apply')?.addEventListener('click', async () => {
+    const userId = (document.getElementById('pg-label-user').value || '').trim();
+    const parentApprover = document.getElementById('pg-label-approver').checked;
+    const childProfile = document.getElementById('pg-label-child').checked;
+    if (!userId) return;
+    try {
+      await api('/ParentGuard/labels', { method: 'POST', body: JSON.stringify({ userId, parentApprover, childProfile }) });
+      document.getElementById('pg-status').textContent = 'Label updated.';
+    } catch (e) {
+      document.getElementById('pg-status').textContent = 'Error updating label.';
+    }
+  });
+
+  async function loadRequests() {
+    try {
+      const data = await api('/ParentGuard/requests');
+      const container = document.getElementById('pg-requests');
+      container.innerHTML = '';
+      (data.items || []).forEach(item => {
+        const div = document.createElement('div');
+        div.style.margin = '0.25rem 0';
+        div.textContent = `[${item.status}] user=${item.userId} reason=${item.reason}`;
+        if (item.status === 'pending') {
+          const approve = document.createElement('button');
+          approve.textContent = 'Approve 30m';
+          approve.onclick = async () => {
+            await api(`/ParentGuard/requests/${item.id}/approve`, { method: 'POST', body: JSON.stringify({ durationMinutes: 30 }) });
+            loadRequests();
+          };
+          const deny = document.createElement('button');
+          deny.style.marginLeft = '0.5rem';
+          deny.textContent = 'Deny';
+          deny.onclick = async () => {
+            await api(`/ParentGuard/requests/${item.id}/deny`, { method: 'POST' });
+            loadRequests();
+          };
+          div.appendChild(approve);
+          div.appendChild(deny);
+        }
+        container.appendChild(div);
+      });
+    } catch (e) {
+      document.getElementById('pg-status').textContent = 'Error loading requests.';
+    }
+  }
+
+  document.getElementById('pg-requests-refresh')?.addEventListener('click', loadRequests);
+  loadRequests();
 })();
 
 

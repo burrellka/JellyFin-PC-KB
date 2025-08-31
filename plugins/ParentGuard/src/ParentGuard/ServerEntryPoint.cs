@@ -1,5 +1,4 @@
-// Temporarily disabled until correct Jellyfin 10.10 entrypoint types are confirmed
-#if false
+// Server entrypoint for Jellyfin 10.10
 using System;
 using System.Threading.Tasks;
 using MediaBrowser.Controller.Library;
@@ -116,6 +115,4 @@ namespace Jellyfin.Plugin.ParentGuard
         }
     }
 }
-#endif
-
 

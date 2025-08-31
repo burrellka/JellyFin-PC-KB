@@ -25,6 +25,12 @@ namespace Jellyfin.Plugin.ParentGuard.Services
 
         public EnforcementDecision ShouldAllowPlaybackStart(string userId, ProfilePolicy policy, UserState state, DateTime utcNow, DateTime localNow, int dailyBudgetMinutes)
         {
+            // Active unlock bypasses cooldowns, schedules, and budgets while valid
+            if (state.ActiveUnlockUntilUtc.HasValue && state.ActiveUnlockUntilUtc.Value > utcNow)
+            {
+                return new EnforcementDecision(true);
+            }
+
             if (state.CooldownUntilUtc.HasValue && state.CooldownUntilUtc.Value > utcNow)
             {
                 return new EnforcementDecision(false, "cooldown");

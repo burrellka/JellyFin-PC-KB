@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Jellyfin.Plugin.ParentGuard</AssemblyName>
     <RootNamespace>Jellyfin.Plugin.ParentGuard</RootNamespace>
-    <Version>0.1.0</Version>
+    <Version>0.1.5</Version>
     <Authors>ParentGuard</Authors>
     <PackageId>Jellyfin.Plugin.ParentGuard</PackageId>
     <Description>Server-side parental controls for Jellyfin: schedules, budgets, rate limits, approvals.</Description>

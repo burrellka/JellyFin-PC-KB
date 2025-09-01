@@ -16,7 +16,8 @@ namespace Jellyfin.Plugin.ParentGuard.Services
     {
         public ProfilePolicy GetEffectivePolicy(string userId, PluginConfiguration config)
         {
-            if (config.Profiles.TryGetValue(userId, out var policy))
+            var dict = config.GetProfilesDictionary();
+            if (dict.TryGetValue(userId, out var policy))
             {
                 return policy;
             }

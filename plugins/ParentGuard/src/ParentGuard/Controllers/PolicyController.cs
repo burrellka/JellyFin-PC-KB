@@ -25,7 +25,14 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
         public IActionResult GetAll()
         {
             var cfg = _plugin?.Configuration ?? new PluginConfiguration();
-            return Ok(cfg);
+            // Project list-based config to dictionary view for UI
+            var result = new
+            {
+                Profiles = cfg.GetProfilesDictionary(),
+                Admins = cfg.GetAdminsDictionary(),
+                Notifications = cfg.Notifications
+            };
+            return Ok(result);
         }
 
         [HttpPut("{userId}")]
@@ -35,7 +42,7 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
             {
                 return Problem("Plugin not initialized");
             }
-            _plugin.Configuration.Profiles[userId] = policy;
+            _plugin.Configuration.UpsertProfile(userId, policy);
             _plugin.Save();
             return Ok(policy);
         }
@@ -47,7 +54,7 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
             {
                 return Problem("Plugin not initialized");
             }
-            _plugin.Configuration.Admins = admins;
+            _plugin.Configuration.SetAdminsFromDictionary(admins);
             _plugin.Save();
             return Ok(admins);
         }
@@ -63,11 +70,11 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
             }
             foreach (var a in body.admins)
             {
-                _plugin.Configuration.Admins[a] = new AdminUser { CanApprove = true };
+                _plugin.Configuration.SetAdmin(a, new AdminUser { CanApprove = true });
             }
             foreach (var p in body.profiles)
             {
-                _plugin.Configuration.Profiles[p] = Defaults.CreateDefaultPolicy();
+                _plugin.Configuration.UpsertProfile(p, Defaults.CreateDefaultPolicy());
             }
             _plugin.Save();
             return Ok(new { admins = body.admins, profiles = body.profiles });

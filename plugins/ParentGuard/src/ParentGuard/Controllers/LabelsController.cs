@@ -27,22 +27,22 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
         {
             if (body.parentApprover)
             {
-                _plugin.Configuration.Admins[body.userId] = new AdminUser { CanApprove = true };
+                _plugin.Configuration.SetAdmin(body.userId, new AdminUser { CanApprove = true });
             }
             else
             {
-                _plugin.Configuration.Admins.Remove(body.userId);
+                _plugin.Configuration.RemoveAdmin(body.userId);
             }
 
             if (body.childProfile)
             {
-                _plugin.Configuration.Profiles[body.userId] = _plugin.Configuration.Profiles.ContainsKey(body.userId)
-                    ? _plugin.Configuration.Profiles[body.userId]
-                    : Defaults.CreateDefaultPolicy();
+                var dict = _plugin.Configuration.GetProfilesDictionary();
+                var policy = dict.ContainsKey(body.userId) ? dict[body.userId] : Defaults.CreateDefaultPolicy();
+                _plugin.Configuration.UpsertProfile(body.userId, policy);
             }
             else
             {
-                _plugin.Configuration.Profiles.Remove(body.userId);
+                _plugin.Configuration.RemoveProfile(body.userId);
             }
 
             _plugin.Save();

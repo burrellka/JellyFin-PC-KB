@@ -1,13 +1,67 @@
 using System.Collections.Generic;
+using System.Linq;
 using MediaBrowser.Model.Plugins;
 
 namespace Jellyfin.Plugin.ParentGuard
 {
     public class PluginConfiguration : BasePluginConfiguration
     {
-        public Dictionary<string, ProfilePolicy> Profiles { get; set; } = new();
-        public Dictionary<string, AdminUser> Admins { get; set; } = new();
+        // XML-serializable collections (avoid IDictionary)
+        public List<ProfileEntry> Profiles { get; set; } = new();
+        public List<AdminEntry> Admins { get; set; } = new();
         public NotificationsConfig Notifications { get; set; } = new();
+
+        // Helpers for controllers/services expecting dictionary views
+        public Dictionary<string, ProfilePolicy> GetProfilesDictionary()
+        {
+            return Profiles.ToDictionary(p => p.UserId, p => p.Policy);
+        }
+
+        public Dictionary<string, AdminUser> GetAdminsDictionary()
+        {
+            return Admins.ToDictionary(a => a.UserId, a => a.Admin);
+        }
+
+        public void UpsertProfile(string userId, ProfilePolicy policy)
+        {
+            var existing = Profiles.FirstOrDefault(p => p.UserId == userId);
+            if (existing != null)
+            {
+                existing.Policy = policy;
+            }
+            else
+            {
+                Profiles.Add(new ProfileEntry { UserId = userId, Policy = policy });
+            }
+        }
+
+        public void RemoveProfile(string userId)
+        {
+            Profiles.RemoveAll(p => p.UserId == userId);
+        }
+
+        public void SetAdminsFromDictionary(Dictionary<string, AdminUser> admins)
+        {
+            Admins = admins.Select(kv => new AdminEntry { UserId = kv.Key, Admin = kv.Value }).ToList();
+        }
+
+        public void SetAdmin(string userId, AdminUser admin)
+        {
+            var existing = Admins.FirstOrDefault(a => a.UserId == userId);
+            if (existing != null)
+            {
+                existing.Admin = admin;
+            }
+            else
+            {
+                Admins.Add(new AdminEntry { UserId = userId, Admin = admin });
+            }
+        }
+
+        public void RemoveAdmin(string userId)
+        {
+            Admins.RemoveAll(a => a.UserId == userId);
+        }
     }
 
     public class ProfilePolicy
@@ -42,6 +96,19 @@ namespace Jellyfin.Plugin.ParentGuard
     {
         public bool CanApprove { get; set; } = true;
         public string PinHash { get; set; } = string.Empty; // argon2id planned
+    }
+
+    // XML-serializable entries
+    public class ProfileEntry
+    {
+        public string UserId { get; set; } = string.Empty;
+        public ProfilePolicy Policy { get; set; } = new ProfilePolicy();
+    }
+
+    public class AdminEntry
+    {
+        public string UserId { get; set; } = string.Empty;
+        public AdminUser Admin { get; set; } = new AdminUser();
     }
 
     public class NotificationsConfig

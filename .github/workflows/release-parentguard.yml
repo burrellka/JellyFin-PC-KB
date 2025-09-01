@@ -1,0 +1,71 @@
+name: Release ParentGuard
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build
+        run: |
+          dotnet build -c Release plugins/ParentGuard/src/ParentGuard/ParentGuard.csproj
+
+      - name: Package
+        run: |
+          mkdir -p dist
+          cp plugins/ParentGuard/src/ParentGuard/bin/Release/net8.0/Jellyfin.Plugin.ParentGuard.dll dist/
+          cp plugins/ParentGuard/src/ParentGuard/manifest.json dist/
+          (cd dist && zip -9 -r ParentGuard.zip Jellyfin.Plugin.ParentGuard.dll manifest.json)
+          (cd dist && sha256sum ParentGuard.zip | awk '{print $1}' > sha256.txt)
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/ParentGuard.zip
+            dist/Jellyfin.Plugin.ParentGuard.dll
+            dist/manifest.json
+
+      - name: Update repository.json with checksum and URL
+        env:
+          REPO: ${{ github.repository }}
+          REF: ${{ github.ref }}
+        run: |
+          CHECKSUM=$(cat dist/sha256.txt)
+          TAG=${REF#refs/tags/}
+          VERSION=${TAG#v}
+          URL="https://github.com/${REPO}/releases/download/${TAG}/ParentGuard.zip"
+          TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+          tmp=plugins/ParentGuard/repository.json.tmp
+          jq --arg v "$VERSION" \
+             --arg url "$URL" \
+             --arg sum "$CHECKSUM" \
+             --arg ts "$TS" \
+             '.packages[0].versions = [ { version: $v, targetAbi: "10.10.0.0", sourceUrl: $url, checksum: $sum, timestamp: $ts } ]' \
+             plugins/ParentGuard/repository.json > "$tmp"
+          mv "$tmp" plugins/ParentGuard/repository.json
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add plugins/ParentGuard/repository.json
+          git commit -m "repo: update to ${TAG} (sha256=${CHECKSUM})"
+          git push
+
+

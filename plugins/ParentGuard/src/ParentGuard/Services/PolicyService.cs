@@ -38,20 +38,22 @@ namespace Jellyfin.Plugin.ParentGuard.Services
                 _ => "Mon"
             };
 
-            foreach (var kv in policy.Schedules)
+            foreach (var sched in policy.Schedules)
             {
-                var key = kv.Key;
-                if (key == label || (key == "Mon-Fri" && nowLocal.DayOfWeek is >= DayOfWeek.Monday and <= DayOfWeek.Friday) || (key == "Sat-Sun" && (nowLocal.DayOfWeek == DayOfWeek.Saturday || nowLocal.DayOfWeek == DayOfWeek.Sunday)))
+                var key = sched.Label;
+                var isMatch = key == label ||
+                              (key == "Mon-Fri" && nowLocal.DayOfWeek is >= DayOfWeek.Monday and <= DayOfWeek.Friday) ||
+                              (key == "Sat-Sun" && (nowLocal.DayOfWeek == DayOfWeek.Saturday || nowLocal.DayOfWeek == DayOfWeek.Sunday));
+                if (!isMatch) continue;
+
+                foreach (var window in sched.Windows)
                 {
-                    foreach (var window in kv.Value)
+                    if (TimeOnly.TryParse(window.Start, out var s) && TimeOnly.TryParse(window.End, out var e))
                     {
-                        if (TimeOnly.TryParse(window.Start, out var s) && TimeOnly.TryParse(window.End, out var e))
+                        var nowT = TimeOnly.FromDateTime(nowLocal);
+                        if (nowT >= s && nowT <= e)
                         {
-                            var nowT = TimeOnly.FromDateTime(nowLocal);
-                            if (nowT >= s && nowT <= e)
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
                 }
@@ -72,11 +74,8 @@ namespace Jellyfin.Plugin.ParentGuard.Services
                 DayOfWeek.Sunday => "Sun",
                 _ => "Mon"
             };
-            if (policy.BudgetsByDow.TryGetValue(label, out var m))
-            {
-                return m;
-            }
-            return policy.DailyBudgetMinutes;
+            var match = policy.Budgets.FirstOrDefault(b => b.Label == label);
+            return match?.Minutes ?? policy.DailyBudgetMinutes;
         }
     }
 }

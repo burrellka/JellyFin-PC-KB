@@ -9,11 +9,11 @@ namespace Jellyfin.Plugin.ParentGuard
             return new ProfilePolicy
             {
                 DailyBudgetMinutes = 240,
-                BudgetsByDow = new Dictionary<string, int>(),
-                Schedules = new Dictionary<string, List<TimeWindow>>
+                Budgets = new List<BudgetByDay>(),
+                Schedules = new List<ScheduleByLabel>
                 {
-                    { "Mon-Fri", new List<TimeWindow> { new TimeWindow { Start = "07:00", End = "19:00" } } },
-                    { "Sat-Sun", new List<TimeWindow> { new TimeWindow { Start = "07:00", End = "19:00" } } }
+                    new ScheduleByLabel { Label = "Mon-Fri", Windows = new List<TimeWindow> { new TimeWindow { Start = "07:00", End = "19:00" } } },
+                    new ScheduleByLabel { Label = "Sat-Sun", Windows = new List<TimeWindow> { new TimeWindow { Start = "07:00", End = "19:00" } } }
                 },
                 SeekRateLimit = new RateLimit { MaxEvents = 3, WindowMinutes = 30 },
                 SwitchRateLimit = new RateLimit { MaxEvents = 2, WindowMinutes = 30 },

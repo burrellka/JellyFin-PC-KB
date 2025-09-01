@@ -68,8 +68,9 @@ namespace Jellyfin.Plugin.ParentGuard
     {
         public bool Enabled { get; set; } = true;
         public int DailyBudgetMinutes { get; set; } = 90;
-        public Dictionary<string, int> BudgetsByDow { get; set; } = new();
-        public Dictionary<string, List<TimeWindow>> Schedules { get; set; } = new();
+        // XML-serializable structures (no IDictionary)
+        public List<BudgetByDay> Budgets { get; set; } = new();
+        public List<ScheduleByLabel> Schedules { get; set; } = new();
         public RateLimit SeekRateLimit { get; set; } = new();
         public RateLimit SwitchRateLimit { get; set; } = new();
         public int CooldownOnTripMinutes { get; set; } = 5;
@@ -90,6 +91,18 @@ namespace Jellyfin.Plugin.ParentGuard
     {
         public int MaxEvents { get; set; } = 6;
         public int WindowMinutes { get; set; } = 10;
+    }
+
+    public class BudgetByDay
+    {
+        public string Label { get; set; } = "Mon"; // Mon, Tue, ..., Mon-Fri, Sat-Sun
+        public int Minutes { get; set; } = 240;
+    }
+
+    public class ScheduleByLabel
+    {
+        public string Label { get; set; } = "Mon-Fri"; // Mon, Tue, ..., Mon-Fri, Sat-Sun
+        public List<TimeWindow> Windows { get; set; } = new();
     }
 
     public class AdminUser

@@ -26,9 +26,16 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
         {
             var cfg = _plugin?.Configuration ?? new PluginConfiguration();
             // Project list-based config to dictionary view for UI
+            var profilesDict = cfg.Profiles.ToDictionary(p => p.UserId, p => p.Policy);
+            // Convert list structures back to dictionaries for UI compatibility
+            foreach (var kv in profilesDict)
+            {
+                var policy = kv.Value;
+                // no-op: UI uses endpoints that compute budgets/schedules per day/label via PolicyService
+            }
             var result = new
             {
-                Profiles = cfg.GetProfilesDictionary(),
+                Profiles = profilesDict,
                 Admins = cfg.GetAdminsDictionary(),
                 Notifications = cfg.Notifications
             };

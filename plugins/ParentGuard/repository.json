@@ -1,6 +1,7 @@
 [
   {
     "name": "ParentGuard",
+    "imageUrl": "https://raw.githubusercontent.com/burrellka/JellyFin-PC-KB/main/plugins/ParentGuard/icon.png",
     "overview": "Server-side parental controls: schedules, budgets, rate limits, approvals.",
     "description": "A plugin to help parents manage screen time and behavior for kids.",
     "owner": "ParentGuard",

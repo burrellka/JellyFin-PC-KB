@@ -25,6 +25,16 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
             _plugin = plugin;
         }
 
+        // Fallback constructor when DI isn't available
+        public SimController()
+        {
+            _store = Services.ServiceHub.Requests;
+            _policies = Services.ServiceHub.Policies;
+            _state = Services.ServiceHub.State;
+            _enforce = Services.ServiceHub.Enforcement;
+            _plugin = Plugin.Instance!;
+        }
+
         [HttpPost("playback/start/{userId}")]
         public IActionResult Start(string userId)
         {

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using MediaBrowser.Controller.Library;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Jellyfin.Plugin.ParentGuard.Services
 {
@@ -21,6 +22,11 @@ namespace Jellyfin.Plugin.ParentGuard.Services
         public EnforcementService(ILogger<EnforcementService> logger)
         {
             _logger = logger;
+        }
+
+        public EnforcementService()
+        {
+            _logger = NullLogger<EnforcementService>.Instance;
         }
 
         public EnforcementDecision ShouldAllowPlaybackStart(string userId, ProfilePolicy policy, UserState state, DateTime utcNow, DateTime localNow, int dailyBudgetMinutes)

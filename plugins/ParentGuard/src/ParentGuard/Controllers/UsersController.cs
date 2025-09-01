@@ -19,7 +19,7 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var list = _users.Users.Select(u => new { id = u.Id.ToString() }).ToArray();
+            var list = _users.Users.Select(u => new { id = u.Id.ToString(), name = u.Username }).ToArray();
             return Ok(new { items = list });
         }
     }

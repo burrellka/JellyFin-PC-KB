@@ -1,9 +1,309 @@
-<div class="parentguard">
-  <h2>ParentGuard</h2>
-  <p>Configure approvers and child profiles, daily budgets, schedules, and review approvals.</p>
-  <div id="pg-root"></div>
-  <script src="parentguard.js"></script>
-  <link rel="stylesheet" href="parentguard.css" />
+<div id="ParentGuardConfigurationPage" data-role="page" class="page type-interior pluginConfigurationPage parentguardConfigurationPage">
+  <div class="content-primary">
+    <div class="parentguard">
+      <h2>ParentGuard</h2>
+      <p>Configure approvers and child profiles, daily budgets, schedules, and review approvals.</p>
+      <div id="pg-root"></div>
+    </div>
+  </div>
+  <style>
+  .parentguard { padding: 1rem; }
+  .parentguard h2 { margin-top: 0; }
+  .parentguard input { padding: 0.4rem; }
+  </style>
+  <script>
+  (() => {
+    const html = `
+      <div>
+        <div style="margin: 1rem 0; display:flex; gap:1rem; align-items:flex-end;">
+          <div>
+            <button id="pg-refresh" class="raised button-submit">Refresh Users</button>
+          </div>
+          <div>
+            <button id="pg-save-labels" class="raised button-submit">Save Selections</button>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:2rem;">
+          <div style="flex:1;">
+            <label>Approvers</label>
+            <select id="pg-approver-list" multiple size="8" style="width:100%;"></select>
+          </div>
+          <div style="flex:1;">
+            <label>Children</label>
+            <select id="pg-child-list" multiple size="8" style="width:100%;"></select>
+          </div>
+        </div>
+
+        <hr/>
+
+        <div style="margin-top:1rem;">
+          <h3>Edit Child Policy</h3>
+          <div style="display:flex; gap:1rem; align-items:center;">
+            <label>Child</label>
+            <select id="pg-policy-child" style="min-width:240px;"></select>
+            <button id="pg-load-policy" class="raised">Load</button>
+          </div>
+        </div>
+
+        <div id="pg-policy" style="margin-top:1rem; display:none;">
+          <div style="display:flex; gap:2rem; flex-wrap:wrap;">
+            <div>
+              <label><input type="checkbox" id="pg-enabled" checked/> Enabled</label>
+            </div>
+            <div>
+              <label>Cooldown on trip (minutes)</label>
+              <input id="pg-cooldown" type="number" value="30" />
+            </div>
+            <div>
+              <label>Seek: Max events</label>
+              <input id="pg-seek-max" type="number" value="3" />
+            </div>
+            <div>
+              <label>Seek: Window minutes</label>
+              <input id="pg-seek-window" type="number" value="30" />
+            </div>
+            <div>
+              <label>Switch: Max events</label>
+              <input id="pg-switch-max" type="number" value="2" />
+            </div>
+            <div>
+              <label>Switch: Window minutes</label>
+              <input id="pg-switch-window" type="number" value="30" />
+            </div>
+          </div>
+
+          <div style="margin-top:1rem;">
+            <h4>Daily Budgets (minutes)</h4>
+            <div id="pg-budgets" style="display:grid; grid-template-columns: repeat(7, minmax(90px,1fr)); gap:0.5rem;"></div>
+          </div>
+
+          <div style="margin-top:1rem;">
+            <h4>Allowed Hours (per day, HH:MM-HH:MM)</h4>
+            <div id="pg-hours-grid" style="display:grid; grid-template-columns: repeat(7, minmax(120px,1fr)); gap:0.5rem;"></div>
+          </div>
+
+          <div style="margin-top:1rem;">
+            <button id="pg-save-policy" class="raised button-submit">Save Policy</button>
+          </div>
+        </div>
+
+        <hr/>
+        <div style="margin-top:1rem;">
+          <h3>Approvals</h3>
+          <button id="pg-requests-refresh" class="raised">Refresh Requests</button>
+          <div id="pg-requests" style="margin-top:0.5rem;"></div>
+        </div>
+        <div id="pg-status" style="margin-top:1rem;"></div>
+      </div>`;
+
+    const root = document.getElementById('pg-root');
+    if (root) root.innerHTML = html;
+
+    function api(path, options = {}) {
+      const base = window.ApiClient.serverAddress();
+      const token = (window.ApiClient._serverInfo && window.ApiClient._serverInfo.AccessToken) || (window.ApiClient._authToken ? window.ApiClient._authToken() : '');
+      let url = base + path;
+      if (token) {
+        url += (url.indexOf('?') === -1 ? '?' : '&') + 'api_key=' + encodeURIComponent(token);
+      }
+      const defaultHeaders = token ? { 'X-Emby-Token': token } : {};
+      options.headers = Object.assign({ 'Content-Type': 'application/json' }, defaultHeaders, options.headers || {});
+      return fetch(url, options).then(async r => {
+        if (!r.ok) {
+          const text = await r.text();
+          throw new Error('HTTP ' + r.status + ' ' + r.statusText + ' ' + text);
+        }
+        const ct = r.headers.get('content-type') || '';
+        if (ct.includes('application/json')) return r.json();
+        const t = await r.text();
+        try { return JSON.parse(t); } catch { return { raw: t }; }
+      });
+    }
+
+    const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const DAY_LABELS = { Mon:'Mon', Tue:'Tue', Wed:'Wed', Thu:'Thu', Fri:'Fri', Sat:'Sat', Sun:'Sun' };
+    let USERS = [];
+    let USERNAME = {};
+
+    function option(value, text) {
+      const o = document.createElement('option');
+      o.value = value; o.textContent = text; return o;
+    }
+
+    async function loadUsers() {
+      const data = await api('/ParentGuard/users');
+      USERS = data.items || [];
+      USERNAME = {};
+      USERS.forEach(u => { USERNAME[u.id] = u.name || u.id; });
+      const approverList = document.getElementById('pg-approver-list');
+      const childList = document.getElementById('pg-child-list');
+      approverList.innerHTML = ''; childList.innerHTML = '';
+      USERS.forEach(u => {
+        approverList.appendChild(option(u.id, USERNAME[u.id]));
+        childList.appendChild(option(u.id, USERNAME[u.id]));
+      });
+    }
+
+    function getSelected(selectEl){
+      return Array.from(selectEl.selectedOptions).map(o => o.value);
+    }
+
+    async function loadConfigAndMark() {
+      const cfg = await api('/ParentGuard/policy');
+      const admins = Object.keys(cfg.Admins || {});
+      const profiles = Object.keys(cfg.Profiles || {});
+      const approverList = document.getElementById('pg-approver-list');
+      const childList = document.getElementById('pg-child-list');
+      Array.from(approverList.options).forEach(o => { o.selected = admins.includes(o.value); });
+      Array.from(childList.options).forEach(o => { o.selected = profiles.includes(o.value); });
+      // Populate policy child dropdown
+      const sel = document.getElementById('pg-policy-child');
+      sel.innerHTML = '';
+      profiles.forEach(id => sel.appendChild(option(id, USERNAME[id] || id)));
+    }
+
+    async function saveSelections() {
+      // Save approvers via admins PUT
+      const admins = {};
+      getSelected(document.getElementById('pg-approver-list')).forEach(id => admins[id] = { CanApprove: true, PinHash: '' });
+      await api('/ParentGuard/policy/admins', { method: 'PUT', body: JSON.stringify(admins) });
+      // Save children via labels endpoint for each user (add/remove profiles)
+      const selected = new Set(getSelected(document.getElementById('pg-child-list')));
+      await Promise.all(USERS.map(u => api('/ParentGuard/labels', { method: 'POST', body: JSON.stringify({ userId: u.id, parentApprover: !!admins[u.id], childProfile: selected.has(u.id) }) })));
+      document.getElementById('pg-status').textContent = 'Selections saved';
+      await loadConfigAndMark();
+    }
+
+    function ensureDayEditors() {
+      const b = document.getElementById('pg-budgets');
+      const h = document.getElementById('pg-hours-grid');
+      if (b.children.length === 0) {
+        DAYS.forEach(d => {
+          const wrap = document.createElement('div');
+          const lab = document.createElement('div'); lab.textContent = DAY_LABELS[d]; lab.style.marginBottom = '0.25rem';
+          const input = document.createElement('input'); input.type='number'; input.id = 'pg-budget-'+d; input.value = '240'; input.style.width='100%';
+          wrap.appendChild(lab); wrap.appendChild(input); b.appendChild(wrap);
+        });
+      }
+      if (h.children.length === 0) {
+        DAYS.forEach(d => {
+          const wrap = document.createElement('div');
+          const lab = document.createElement('div'); lab.textContent = DAY_LABELS[d]; lab.style.marginBottom = '0.25rem';
+          const input = document.createElement('input'); input.type='text'; input.id = 'pg-hours-'+d; input.value='07:00-19:00'; input.style.width='100%';
+          wrap.appendChild(lab); wrap.appendChild(input); h.appendChild(wrap);
+        });
+      }
+    }
+
+    async function loadPolicy() {
+      const childId = document.getElementById('pg-policy-child').value;
+      if (!childId) { document.getElementById('pg-policy').style.display='none'; return; }
+      const cfg = await api('/ParentGuard/policy');
+      const p = (cfg.Profiles && cfg.Profiles[childId]) || null;
+      ensureDayEditors();
+      document.getElementById('pg-policy').style.display = 'block';
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      const setNum = (id, v) => setVal(id, (v!=null?v:0));
+      document.getElementById('pg-enabled').checked = p ? !!p.Enabled : true;
+      setNum('pg-cooldown', p ? p.CooldownOnTripMinutes : 30);
+      setNum('pg-seek-max', p ? (p.SeekRateLimit?.MaxEvents ?? 3) : 3);
+      setNum('pg-seek-window', p ? (p.SeekRateLimit?.WindowMinutes ?? 30) : 30);
+      setNum('pg-switch-max', p ? (p.SwitchRateLimit?.MaxEvents ?? 2) : 2);
+      setNum('pg-switch-window', p ? (p.SwitchRateLimit?.WindowMinutes ?? 30) : 30);
+      // Budgets by day
+      DAYS.forEach(d => {
+        const m = p && p.BudgetsByDow && p.BudgetsByDow[d];
+        setNum('pg-budget-'+d, m != null ? m : (p ? p.DailyBudgetMinutes : 240));
+      });
+      // Hours by day (take first window if present)
+      DAYS.forEach(d => {
+        let val = '07:00-19:00';
+        if (p && p.Schedules && p.Schedules[d] && p.Schedules[d].length>0) {
+          const w = p.Schedules[d][0];
+          val = (w.Start||'07:00') + '-' + (w.End||'19:00');
+        }
+        const el = document.getElementById('pg-hours-'+d); if (el) el.value = val;
+      });
+    }
+
+    async function savePolicy() {
+      const childId = document.getElementById('pg-policy-child').value;
+      if (!childId) return;
+      const policy = {
+        Enabled: document.getElementById('pg-enabled').checked,
+        DailyBudgetMinutes: 240,
+        BudgetsByDow: {},
+        Schedules: {},
+        SeekRateLimit: { MaxEvents: parseInt(document.getElementById('pg-seek-max').value||'0',10), WindowMinutes: parseInt(document.getElementById('pg-seek-window').value||'0',10) },
+        SwitchRateLimit: { MaxEvents: parseInt(document.getElementById('pg-switch-max').value||'0',10), WindowMinutes: parseInt(document.getElementById('pg-switch-window').value||'0',10) },
+        CooldownOnTripMinutes: parseInt(document.getElementById('pg-cooldown').value||'0',10),
+        PinOverridesAllowed: true,
+        PinRequiredForExtraTime: true,
+        UnlockMaxDurationMinutes: 180,
+        BlockedCollections: [],
+        Notes: ''
+      };
+      DAYS.forEach(d => {
+        const m = parseInt(document.getElementById('pg-budget-'+d).value||'0',10);
+        policy.BudgetsByDow[d] = isNaN(m)?0:m;
+      });
+      DAYS.forEach(d => {
+        const t = (document.getElementById('pg-hours-'+d).value||'07:00-19:00').trim();
+        const parts = t.split('-');
+        const start = (parts[0]||'07:00').trim();
+        const end = (parts[1]||'19:00').trim();
+        policy.Schedules[d] = [{ Start: start, End: end }];
+      });
+      await api('/ParentGuard/policy/'+encodeURIComponent(childId), { method:'PUT', body: JSON.stringify(policy) });
+      document.getElementById('pg-status').textContent = 'Policy saved for ' + (USERNAME[childId]||childId);
+    }
+
+    document.getElementById('pg-refresh')?.addEventListener('click', async ()=>{ await loadUsers(); await loadConfigAndMark(); });
+    document.getElementById('pg-save-labels')?.addEventListener('click', saveSelections);
+    document.getElementById('pg-load-policy')?.addEventListener('click', loadPolicy);
+    document.getElementById('pg-save-policy')?.addEventListener('click', savePolicy);
+
+    // initial load
+    (async () => { try { await loadUsers(); await loadConfigAndMark(); } catch(e) { document.getElementById('pg-status').textContent = 'Init error: ' + (e && e.message ? e.message : e); } })();
+
+    async function loadRequests() {
+      try {
+        const data = await api('/ParentGuard/requests');
+        const container = document.getElementById('pg-requests');
+        container.innerHTML = '';
+        (data.items || []).forEach(item => {
+          const div = document.createElement('div');
+          div.style.margin = '0.25rem 0';
+          div.textContent = `[${item.status}] user=${item.userId} reason=${item.reason}`;
+          if (item.status === 'pending') {
+            const approve = document.createElement('button');
+            approve.textContent = 'Approve 30m';
+            approve.onclick = async () => {
+              await api(`/ParentGuard/requests/${item.id}/approve`, { method: 'POST', body: JSON.stringify({ durationMinutes: 30 }) });
+              loadRequests();
+            };
+            const deny = document.createElement('button');
+            deny.style.marginLeft = '0.5rem';
+            deny.textContent = 'Deny';
+            deny.onclick = async () => {
+              await api(`/ParentGuard/requests/${item.id}/deny`, { method: 'POST' });
+              loadRequests();
+            };
+            div.appendChild(approve);
+            div.appendChild(deny);
+          }
+          container.appendChild(div);
+        });
+      } catch (e) {
+        document.getElementById('pg-status').textContent = 'Error loading requests: ' + (e && e.message ? e.message : 'unknown');
+      }
+    }
+
+    document.getElementById('pg-requests-refresh')?.addEventListener('click', loadRequests);
+    loadRequests();
+  })();
+  </script>
 </div>
 
 

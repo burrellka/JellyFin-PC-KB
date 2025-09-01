@@ -16,6 +16,11 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
             _state = state;
         }
 
+        public StateController()
+        {
+            _state = Services.ServiceHub.State;
+        }
+
         [HttpGet("{userId}")]
         public IActionResult GetState(string userId)
         {

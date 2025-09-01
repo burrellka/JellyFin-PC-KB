@@ -30,10 +30,19 @@ namespace Jellyfin.Plugin.ParentGuard
         {
             return new[]
             {
+                // Main entry matches plugin Name so Settings and nav work
                 new PluginPageInfo
                 {
                     Name = "ParentGuard",
                     EmbeddedResourcePath = GetType().Namespace + ".Web.parentguard.html",
+                    EnableInMainMenu = true
+                },
+                // Alias (direct URL support: ?name=parentguard)
+                new PluginPageInfo
+                {
+                    Name = "parentguard",
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.parentguard.html",
+                    EnableInMainMenu = false
                 },
                 new PluginPageInfo
                 {

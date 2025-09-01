@@ -9,21 +9,32 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
     [Authorize(Policy = "RequiresElevation")] // admin only
     public class PolicyController : ControllerBase
     {
-        private readonly Plugin _plugin;
+        private readonly Plugin? _plugin;
         public PolicyController(Plugin plugin)
         {
             _plugin = plugin;
         }
 
+        // Fallback when DI is unavailable
+        public PolicyController()
+        {
+            _plugin = Plugin.Instance;
+        }
+
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(_plugin.Configuration);
+            var cfg = _plugin?.Configuration ?? new PluginConfiguration();
+            return Ok(cfg);
         }
 
         [HttpPut("{userId}")]
         public IActionResult Upsert(string userId, [FromBody] ProfilePolicy policy)
         {
+            if (_plugin == null)
+            {
+                return Problem("Plugin not initialized");
+            }
             _plugin.Configuration.Profiles[userId] = policy;
             _plugin.Save();
             return Ok(policy);
@@ -32,6 +43,10 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
         [HttpPut("admins")] 
         public IActionResult SetAdmins([FromBody] Dictionary<string, AdminUser> admins)
         {
+            if (_plugin == null)
+            {
+                return Problem("Plugin not initialized");
+            }
             _plugin.Configuration.Admins = admins;
             _plugin.Save();
             return Ok(admins);
@@ -42,6 +57,10 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
         [HttpPost("seed")] 
         public IActionResult Seed([FromBody] SeedBody body)
         {
+            if (_plugin == null)
+            {
+                return Problem("Plugin not initialized");
+            }
             foreach (var a in body.admins)
             {
                 _plugin.Configuration.Admins[a] = new AdminUser { CanApprove = true };

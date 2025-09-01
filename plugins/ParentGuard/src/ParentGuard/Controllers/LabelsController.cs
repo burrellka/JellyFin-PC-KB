@@ -15,6 +15,11 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
             _plugin = plugin;
         }
 
+        public LabelsController()
+        {
+            _plugin = Plugin.Instance!;
+        }
+
         public record LabelBody(string userId, bool parentApprover, bool childProfile);
 
         [HttpPost]

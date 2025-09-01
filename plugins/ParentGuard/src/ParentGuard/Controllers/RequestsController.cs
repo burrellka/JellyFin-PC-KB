@@ -17,6 +17,13 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
             _state = state;
         }
 
+        // Fallback constructor for when DI is unavailable
+        public RequestsController()
+        {
+            _store = Services.ServiceHub.Requests;
+            _state = Services.ServiceHub.State;
+        }
+
         [HttpGet("requests")]
         public IActionResult GetRequests()
         {

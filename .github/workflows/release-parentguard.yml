@@ -32,7 +32,7 @@ jobs:
           cp plugins/ParentGuard/src/ParentGuard/bin/Release/net8.0/Jellyfin.Plugin.ParentGuard.dll dist/
           cp plugins/ParentGuard/src/ParentGuard/manifest.json dist/
           (cd dist && zip -9 -r ParentGuard.zip Jellyfin.Plugin.ParentGuard.dll manifest.json)
-          (cd dist && sha256sum ParentGuard.zip | awk '{print $1}' > sha256.txt)
+          (cd dist && md5sum ParentGuard.zip | awk '{print $1}' > md5.txt)
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
@@ -42,13 +42,13 @@ jobs:
             dist/Jellyfin.Plugin.ParentGuard.dll
             dist/manifest.json
 
-      - name: Update repository.json with checksum and URL
+      - name: Update repository.json with checksum and URL (MD5)
         env:
           REPO: ${{ github.repository }}
           REF: ${{ github.ref }}
         run: |
           set -euo pipefail
-          CHECKSUM=$(cat dist/sha256.txt)
+          CHECKSUM=$(cat dist/md5.txt)
           TAG=${REF#refs/tags/}
           VERSION=${TAG#v}
           URL="https://github.com/${REPO}/releases/download/${TAG}/ParentGuard.zip"

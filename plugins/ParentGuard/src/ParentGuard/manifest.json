@@ -1,7 +1,7 @@
 {
   "name": "ParentGuard",
   "guid": "d5b86f5a-6a4c-4f7c-9f7c-8f52594b8b51",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "targetAbi": "10.10.0.0",
   "description": "Server-side parental controls: schedules, budgets, rate limits, approvals.",
   "category": "General",

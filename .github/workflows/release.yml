@@ -42,13 +42,13 @@ jobs:
           cd dist
           zip -r ParentGuard.zip .
 
-      - name: Compute checksum and update repository.json
+      - name: Compute checksum and update repository.json (MD5, array format)
         run: |
           set -e
           TAG=${GITHUB_REF_NAME}
           VERSION=${TAG#v}
           ZIP_PATH=dist/ParentGuard.zip
-          CHECKSUM=$(sha256sum "$ZIP_PATH" | awk '{print $1}')
+          CHECKSUM=$(md5sum "$ZIP_PATH" | awk '{print $1}')
           TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           SRC_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/ParentGuard.zip"
           # Create updated repository.json in dist/
@@ -57,7 +57,7 @@ jobs:
             --arg url "$SRC_URL" \
             --arg sum "$CHECKSUM" \
             --arg ts "$TS" \
-            '.packages[0].versions[0].version=$ver | .packages[0].versions[0].sourceUrl=$url | .packages[0].versions[0].checksum=$sum | .packages[0].versions[0].timestamp=$ts' \
+            'map(if .name == "ParentGuard" then .versions = [{ version: $ver, targetAbi: "10.10.0.0", sourceUrl: $url, checksum: $sum, timestamp: $ts }] else . end)' \
             plugins/ParentGuard/repository.json > dist/repository.json
 
       - name: Commit repository.json back to main

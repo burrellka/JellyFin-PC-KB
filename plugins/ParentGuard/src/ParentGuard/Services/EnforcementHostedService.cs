@@ -13,7 +13,6 @@ namespace Jellyfin.Plugin.ParentGuard.Services
     {
         private readonly ILogger<EnforcementHostedService> _logger;
         private readonly ISessionManager _sessions;
-        private readonly IPlaybackManager _playback;
         private readonly IPolicyService _policies;
         private readonly IStateService _state;
         private readonly IEnforcementService _enforce;
@@ -22,7 +21,6 @@ namespace Jellyfin.Plugin.ParentGuard.Services
         public EnforcementHostedService(
             ILogger<EnforcementHostedService> logger,
             ISessionManager sessions,
-            IPlaybackManager playback,
             IPolicyService policies,
             IStateService state,
             IEnforcementService enforce,
@@ -30,7 +28,6 @@ namespace Jellyfin.Plugin.ParentGuard.Services
         {
             _logger = logger;
             _sessions = sessions;
-            _playback = playback;
             _policies = policies;
             _state = state;
             _enforce = enforce;
@@ -40,18 +37,18 @@ namespace Jellyfin.Plugin.ParentGuard.Services
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("ParentGuard enforcement service starting");
-            _playback.PlaybackStart += OnPlaybackStart;
-            _playback.PlaybackProgress += OnPlaybackProgress;
-            _playback.PlaybackStopped += OnPlaybackStopped;
+            _sessions.PlaybackStart += OnPlaybackStart;
+            _sessions.PlaybackProgress += OnPlaybackProgress;
+            _sessions.PlaybackStopped += OnPlaybackStopped;
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("ParentGuard enforcement service stopping");
-            _playback.PlaybackStart -= OnPlaybackStart;
-            _playback.PlaybackProgress -= OnPlaybackProgress;
-            _playback.PlaybackStopped -= OnPlaybackStopped;
+            _sessions.PlaybackStart -= OnPlaybackStart;
+            _sessions.PlaybackProgress -= OnPlaybackProgress;
+            _sessions.PlaybackStopped -= OnPlaybackStopped;
             return Task.CompletedTask;
         }
 

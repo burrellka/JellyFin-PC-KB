@@ -42,7 +42,8 @@ jobs:
             dist/Jellyfin.Plugin.ParentGuard.dll
             dist/manifest.json
 
-      - name: Update repository.json with checksum and URL (MD5)
+      - name: Prepare repository.json change
+        id: repoprep
         env:
           REPO: ${{ github.repository }}
           REF: ${{ github.ref }}
@@ -53,32 +54,21 @@ jobs:
           VERSION=${TAG#v}
           URL="https://github.com/${REPO}/releases/download/${TAG}/ParentGuard.zip"
           TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-
           SRC=plugins/ParentGuard/repository.json
-          TMP=plugins/ParentGuard/repository.json.tmp
-
-          # Handle both legacy (object with .packages) and current (top-level array) formats
-          if jq -e 'type == "array"' "$SRC" > /dev/null; then
-            jq --arg v "$VERSION" \
-               --arg url "$URL" \
-               --arg sum "$CHECKSUM" \
-               --arg ts "$TS" \
-               'map(if .name == "ParentGuard" then .versions = [{ version: $v, targetAbi: "10.10.0.0", sourceUrl: $url, checksum: $sum, timestamp: $ts }] else . end)' \
-               "$SRC" > "$TMP"
-          else
-            jq --arg v "$VERSION" \
-               --arg url "$URL" \
-               --arg sum "$CHECKSUM" \
-               --arg ts "$TS" \
-               '.packages = [ { name: "ParentGuard", overview: .packages[0].overview, description: .packages[0].description, owner: .packages[0].owner, category: .packages[0].category, guid: .packages[0].guid, versions: [{ version: $v, targetAbi: "10.10.0.0", sourceUrl: $url, checksum: $sum, timestamp: $ts }] } ]' \
-               "$SRC" > "$TMP"
-          fi
+          TMP=plugins/ParentGuard/repository.tmp.json
+          jq --arg v "$VERSION" --arg url "$URL" --arg sum "$CHECKSUM" --arg ts "$TS" \
+             'map(if .name == "ParentGuard" then .versions = [{ version: $v, targetAbi: "10.10.0.0", sourceUrl: $url, checksum: $sum, timestamp: $ts }] else . end)' \
+             "$SRC" > "$TMP"
           mv "$TMP" "$SRC"
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$SRC"
-          git commit -m "repo: update to ${TAG} (sha256=${CHECKSUM})" || echo "No changes to commit"
-          git push || echo "No changes to push"
+      - name: Create Pull Request to update repository.json
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(release): update repository.json for ${{ github.ref_name }}"
+          title: "chore(release): update repository.json for ${{ github.ref_name }}"
+          body: "This PR updates plugins/ParentGuard/repository.json with MD5 and URL for ${{ github.ref_name }}."
+          branch: "ci/repojson-${{ github.ref_name }}"
+          base: "main"
 
 

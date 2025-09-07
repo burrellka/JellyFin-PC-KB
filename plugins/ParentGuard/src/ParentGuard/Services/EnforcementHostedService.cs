@@ -54,7 +54,7 @@ namespace Jellyfin.Plugin.ParentGuard.Services
 
         private void OnPlaybackStart(object? sender, PlaybackProgressEventArgs e)
         {
-            var userId = e.UserId?.ToString();
+            var userId = e.Session?.UserId?.ToString();
             if (string.IsNullOrEmpty(userId)) return;
             var policy = _policies.GetEffectivePolicy(userId, _plugin.Configuration);
             var state = _state.Get(userId);
@@ -65,7 +65,7 @@ namespace Jellyfin.Plugin.ParentGuard.Services
             if (!decision.Allow)
             {
                 _logger.LogInformation("ParentGuard: blocking start for {User} due to {Reason}", userId, decision.Reason);
-                TryStop(e.SessionId);
+                TryStop(e.Session?.Id);
                 if (decision.CooldownMinutes.HasValue)
                 {
                     _state.SetCooldown(userId, utcNow.AddMinutes(decision.CooldownMinutes.Value));
@@ -75,41 +75,10 @@ namespace Jellyfin.Plugin.ParentGuard.Services
 
         private void OnPlaybackProgress(object? sender, PlaybackProgressEventArgs e)
         {
-            var userId = e.UserId?.ToString();
+            // For now, only track time consumption on progress at 60s boundaries; seek/switch enforcement will come later
+            var userId = e.Session?.UserId?.ToString();
             if (string.IsNullOrEmpty(userId)) return;
-
-            var utcNow = DateTime.UtcNow;
-            var policy = _policies.GetEffectivePolicy(userId, _plugin.Configuration);
-            var state = _state.Get(userId);
-
-            // Detect item switch
-            if (e.IsPlaying && e.PlaybackStopTime != null && e.PositionTicks != null && e.PositionTicks.Value == 0)
-            {
-                var sw = _enforce.ShouldAllowSwitch(userId, policy, state, utcNow);
-                if (!sw.Allow)
-                {
-                    _logger.LogInformation("ParentGuard: switch rate-limit hit for {User}", userId);
-                    _state.SetCooldown(userId, utcNow.AddMinutes(sw.CooldownMinutes ?? policy.CooldownOnTripMinutes));
-                    TryStop(e.SessionId);
-                    return;
-                }
-                _state.AddSwitch(userId, utcNow);
-            }
-
-            // Detect seek by large jump in progress
-            // Jellyfin doesn’t expose a direct seek event here; treat any backward/forward jump > 10s as a seek.
-            if (e.SeekPositionTicks.HasValue)
-            {
-                var sk = _enforce.ShouldAllowSeek(userId, policy, state, utcNow);
-                if (!sk.Allow)
-                {
-                    _logger.LogInformation("ParentGuard: seek rate-limit hit for {User}", userId);
-                    _state.SetCooldown(userId, utcNow.AddMinutes(sk.CooldownMinutes ?? policy.CooldownOnTripMinutes));
-                    TryStop(e.SessionId);
-                    return;
-                }
-                _state.AddSeek(userId, utcNow);
-            }
+            _state.AddMinutes(userId, 1, DateTime.UtcNow);
         }
 
         private void OnPlaybackStopped(object? sender, PlaybackStopEventArgs e)
@@ -122,7 +91,7 @@ namespace Jellyfin.Plugin.ParentGuard.Services
             if (string.IsNullOrEmpty(sessionId)) return;
             try
             {
-                _sessions.SendMessageCommand(sessionId, "Stop", null);
+                _sessions.SendMessageCommand(sessionId, "Stop", null, default);
             }
             catch (Exception ex)
             {

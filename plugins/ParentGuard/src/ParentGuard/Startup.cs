@@ -15,6 +15,7 @@ namespace Jellyfin.Plugin.ParentGuard
             services.AddSingleton<IEnforcementService, EnforcementService>();
             services.AddSingleton<IRequestsStore, RequestsStore>();
             services.AddHostedService<DailyResetService>();
+            services.AddHostedService<EnforcementHostedService>();
         }
     }
 }

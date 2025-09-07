@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Jellyfin.Plugin.ParentGuard
-build_property.ProjectDir = C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\
+build_property.ProjectDir = /home/runner/work/JellyFin-PC-KB/JellyFin-PC-KB/plugins/ParentGuard/src/ParentGuard/
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 

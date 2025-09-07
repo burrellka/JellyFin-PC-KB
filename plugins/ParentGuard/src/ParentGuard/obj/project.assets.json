@@ -4808,19 +4808,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Kevin\\.nuget\\packages\\": {}
+    "/home/runner/.nuget/packages/": {}
   },
   "project": {
-    "version": "0.1.9",
+    "version": "0.1.15",
     "restore": {
-      "projectUniqueName": "C:\\dev\\JellyFin-PC-KB\\JellyFin-PC-KB\\plugins\\ParentGuard\\src\\ParentGuard\\ParentGuard.csproj",
+      "projectUniqueName": "/home/runner/work/JellyFin-PC-KB/JellyFin-PC-KB/plugins/ParentGuard/src/ParentGuard/ParentGuard.csproj",
       "projectName": "Jellyfin.Plugin.ParentGuard",
-      "projectPath": "C:\\dev\\JellyFin-PC-KB\\JellyFin-PC-KB\\plugins\\ParentGuard\\src\\ParentGuard\\ParentGuard.csproj",
-      "packagesPath": "C:\\Users\\Kevin\\.nuget\\packages\\",
-      "outputPath": "C:\\dev\\JellyFin-PC-KB\\JellyFin-PC-KB\\plugins\\ParentGuard\\src\\ParentGuard\\obj\\",
+      "projectPath": "/home/runner/work/JellyFin-PC-KB/JellyFin-PC-KB/plugins/ParentGuard/src/ParentGuard/ParentGuard.csproj",
+      "packagesPath": "/home/runner/.nuget/packages/",
+      "outputPath": "/home/runner/work/JellyFin-PC-KB/JellyFin-PC-KB/plugins/ParentGuard/src/ParentGuard/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Kevin\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/home/runner/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -4890,7 +4890,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.413/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.413/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

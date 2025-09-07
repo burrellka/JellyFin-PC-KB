@@ -69,7 +69,8 @@ jobs:
           commit-message: "chore(release): update repository.json for ${{ github.ref_name }}"
           title: "chore(release): update repository.json for ${{ github.ref_name }}"
           body: "This PR updates plugins/ParentGuard/repository.json with MD5 and URL for ${{ github.ref_name }}."
-          branch: "ci/repojson-${{ github.ref_name }}"
+          branch: "ci/repojson"
+          branch-suffix: short-commit-hash
           base: "main"
           add-paths: |
             plugins/ParentGuard/repository.json

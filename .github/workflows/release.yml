@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   build:
@@ -42,7 +43,7 @@ jobs:
           cd dist
           zip -r ParentGuard.zip .
 
-      - name: Compute checksum and update repository.json (MD5, array format)
+      - name: Prepare repository.json change (MD5)
         run: |
           set -e
           TAG=${GITHUB_REF_NAME}
@@ -51,25 +52,27 @@ jobs:
           CHECKSUM=$(md5sum "$ZIP_PATH" | awk '{print $1}')
           TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           SRC_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/ParentGuard.zip"
-          # Create updated repository.json in dist/
+          TMP=plugins/ParentGuard/repository.json.tmp
           jq \
             --arg ver "$VERSION" \
             --arg url "$SRC_URL" \
             --arg sum "$CHECKSUM" \
             --arg ts "$TS" \
             'map(if .name == "ParentGuard" then .versions = [{ version: $ver, targetAbi: "10.10.0.0", sourceUrl: $url, checksum: $sum, timestamp: $ts }] else . end)' \
-            plugins/ParentGuard/repository.json > dist/repository.json
+            plugins/ParentGuard/repository.json > "$TMP"
+          mv "$TMP" plugins/ParentGuard/repository.json
 
-      - name: Commit repository.json back to main
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          set -e
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          cp dist/repository.json plugins/ParentGuard/repository.json
-          git add plugins/ParentGuard/repository.json
-          git commit -m "chore(release): update repository.json for ${GITHUB_REF_NAME}" || echo "No changes to commit"
-          git push origin HEAD:main
+      - name: Create Pull Request to update repository.json
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(release): update repository.json for ${{ github.ref_name }}"
+          title: "chore(release): update repository.json for ${{ github.ref_name }}"
+          body: "This PR updates plugins/ParentGuard/repository.json with MD5 and URL for ${{ github.ref_name }}."
+          branch: "ci/repojson-${{ github.ref_name }}"
+          base: "main"
+          add-paths: |
+            plugins/ParentGuard/repository.json
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

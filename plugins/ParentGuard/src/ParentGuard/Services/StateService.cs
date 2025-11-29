@@ -100,6 +100,14 @@ namespace Jellyfin.Plugin.ParentGuard.Services
         public DateTime? CooldownUntilUtc { get; set; }
         public DateTime? ActiveUnlockUntilUtc { get; set; }
         public string ActiveUnlockReason { get; set; } = string.Empty;
+
+        // Seek detection state
+        public long? LastPositionTicks { get; set; }
+        public DateTime? LastProgressUtc { get; set; }
+
+        // Switch detection state
+        public Guid? LastItemId { get; set; }
+        public DateTime? LastStopUtc { get; set; }
     }
 }
 

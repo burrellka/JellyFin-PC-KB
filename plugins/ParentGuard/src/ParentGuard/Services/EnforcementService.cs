@@ -65,7 +65,7 @@ namespace Jellyfin.Plugin.ParentGuard.Services
             var cutoff = utcNow.AddMinutes(-policy.SeekRateLimit.WindowMinutes);
             state.SeekEvents.RemoveAll(t => t < cutoff);
 
-            if (state.SeekEvents.Count >= policy.SeekRateLimit.MaxEvents)
+            if (state.SeekEvents.Count > policy.SeekRateLimit.MaxEvents)
             {
                 return new EnforcementDecision(false, "seek_rate_limit", policy.CooldownOnTripMinutes);
             }
@@ -76,7 +76,7 @@ namespace Jellyfin.Plugin.ParentGuard.Services
         {
             var cutoff = utcNow.AddMinutes(-policy.SwitchRateLimit.WindowMinutes);
             state.SwitchEvents.RemoveAll(t => t < cutoff);
-            if (state.SwitchEvents.Count >= policy.SwitchRateLimit.MaxEvents)
+            if (state.SwitchEvents.Count > policy.SwitchRateLimit.MaxEvents)
             {
                 return new EnforcementDecision(false, "switch_rate_limit", policy.CooldownOnTripMinutes);
             }

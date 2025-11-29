@@ -1,20 +1,25 @@
-[
-  {
-    "name": "ParentGuard",
-    "imageUrl": "https://raw.githubusercontent.com/burrellka/JellyFin-PC-KB/main/plugins/ParentGuard/icon.png",
-    "overview": "Server-side parental controls: schedules, budgets, rate limits, approvals.",
-    "description": "A plugin to help parents manage screen time and behavior for kids.",
-    "owner": "burrellka",
-    "category": "General",
-    "guid": "d5b86f5a-6a4c-4f7c-9f7c-8f52594b8b51",
-    "versions": [
-      {
-        "version": "0.1.20",
-        "targetAbi": "10.10.0.0",
-        "sourceUrl": "https://github.com/burrellka/JellyFin-PC-KB/releases/download/v0.1.20/ParentGuard.zip",
-        "checksum": "fb036e7d8f49cb90ebcd4bd73eb08d3c",
-        "timestamp": "2025-09-07T01:27:31Z"
-      }
-    ]
-  }
-]
+{
+    "name":  "ParentGuard",
+    "imageUrl":  "https://raw.githubusercontent.com/burrellka/JellyFin-PC-KB/main/plugins/ParentGuard/icon.png",
+    "overview":  "Server-side parental controls: schedules, budgets, rate limits, approvals.",
+    "description":  "A plugin to help parents manage screen time and behavior for kids.",
+    "owner":  "burrellka",
+    "category":  "General",
+    "guid":  "d5b86f5a-6a4c-4f7c-9f7c-8f52594b8b51",
+    "versions":  [
+                     {
+                         "timestamp":  "2025-11-29T13:44:48Z",
+                         "sourceUrl":  "https://raw.githubusercontent.com/burrellka/JellyFin-PC-KB/main/dist/ParentGuard.zip",
+                         "targetAbi":  "10.10.0.0",
+                         "version":  "0.1.15",
+                         "checksum":  "d273e5cde97f1a1297a0b1795fc3f293"
+                     },
+                     {
+                         "version":  "0.1.20",
+                         "targetAbi":  "10.10.0.0",
+                         "sourceUrl":  "https://github.com/burrellka/JellyFin-PC-KB/releases/download/v0.1.20/ParentGuard.zip",
+                         "checksum":  "fb036e7d8f49cb90ebcd4bd73eb08d3c",
+                         "timestamp":  "2025-09-07T01:27:31Z"
+                     }
+                 ]
+}

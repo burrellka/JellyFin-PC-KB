@@ -45,10 +45,10 @@ $PluginEntry = $RepoJson[0]
 
 # Create new version entry
 $NewVersion = @{
-    version = $Version
+    version   = $Version
     targetAbi = $TargetAbi
     sourceUrl = $RawUrlBase
-    checksum = $MD5
+    checksum  = $MD5
     timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 }
 
@@ -65,15 +65,17 @@ for ($i = 0; $i -lt $Versions.Count; $i++) {
 if ($ExistingIndex -ge 0) {
     Write-Host "   Updating existing version $Version" -ForegroundColor Cyan
     $Versions[$ExistingIndex] = $NewVersion
-} else {
+}
+else {
     Write-Host "   Adding new version $Version" -ForegroundColor Green
-    $Versions = ,$NewVersion + $Versions
+    $Versions = , $NewVersion + $Versions
 }
 
 $PluginEntry.versions = $Versions
 $RepoJson[0] = $PluginEntry
 
-$RepoJson | ConvertTo-Json -Depth 10 | Set-Content $RepoJsonFile
+# Force array output by wrapping in @()
+@($RepoJson) | ConvertTo-Json -Depth 10 | Set-Content $RepoJsonFile
 
 Write-Host "=== Deployment Prep Complete ===" -ForegroundColor Green
 Write-Host "Now run:" -ForegroundColor White

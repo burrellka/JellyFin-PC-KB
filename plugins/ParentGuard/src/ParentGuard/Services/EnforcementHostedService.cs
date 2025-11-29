@@ -5,6 +5,7 @@ using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Session;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MediaBrowser.Controller.Library;
 
 namespace Jellyfin.Plugin.ParentGuard.Services
 {
@@ -17,6 +18,7 @@ namespace Jellyfin.Plugin.ParentGuard.Services
         private readonly IStateService _state;
         private readonly IEnforcementService _enforce;
         private readonly Plugin _plugin;
+        private readonly IUserManager _userManager;
 
         public EnforcementHostedService(
             ILogger<EnforcementHostedService> logger,
@@ -24,7 +26,8 @@ namespace Jellyfin.Plugin.ParentGuard.Services
             IPolicyService policies,
             IStateService state,
             IEnforcementService enforce,
-            Plugin plugin)
+            Plugin plugin,
+            IUserManager userManager)
         {
             _logger = logger;
             _sessions = sessions;
@@ -32,6 +35,10 @@ namespace Jellyfin.Plugin.ParentGuard.Services
             _state = state;
             _enforce = enforce;
             _plugin = plugin;
+            _userManager = userManager;
+            
+            // Fallback for controllers
+            ServiceHub.UserManager = userManager;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

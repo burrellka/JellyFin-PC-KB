@@ -9,6 +9,7 @@ namespace Jellyfin.Plugin.ParentGuard.Services
         private static IStateService? _state;
         private static IEnforcementService? _enforce;
         private static IRequestsStore? _requests;
+        public static MediaBrowser.Controller.Library.IUserManager? UserManager { get; set; }
 
         public static IPolicyService Policies
         {

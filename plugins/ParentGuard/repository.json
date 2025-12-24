@@ -2,6 +2,13 @@
     "owner":  "burrellka",
     "versions":  [
                      {
+                         "timestamp":  "2025-12-24T20:47:13Z",
+                         "sourceUrl":  "https://raw.githubusercontent.com/burrellka/JellyFin-PC-KB/main/dist/ParentGuard.zip",
+                         "targetAbi":  "10.10.0.0",
+                         "version":  "0.1.23",
+                         "checksum":  "eaa39d1e14e262d2f82b0fbed6295a8d"
+                     },
+                     {
                          "timestamp":  "2025-12-24T20:36:45Z",
                          "sourceUrl":  "https://raw.githubusercontent.com/burrellka/JellyFin-PC-KB/main/dist/ParentGuard.zip",
                          "targetAbi":  "10.10.0.0",

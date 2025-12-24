@@ -8,11 +8,11 @@
     "guid":  "d5b86f5a-6a4c-4f7c-9f7c-8f52594b8b51",
     "versions":  [
                      {
-                         "timestamp":  "2025-11-29T14:51:13Z",
+                         "timestamp":  "2025-12-24T14:10:14Z",
                          "sourceUrl":  "https://raw.githubusercontent.com/burrellka/JellyFin-PC-KB/main/dist/ParentGuard.zip",
                          "targetAbi":  "10.10.0.0",
                          "version":  "0.1.15",
-                         "checksum":  "fd7fb0b9178f9ecf32b9b97a03ed9f7e"
+                         "checksum":  "ec8af975ece37ca1b36f8806097569de"
                      },
                      {
                          "version":  "0.1.20",

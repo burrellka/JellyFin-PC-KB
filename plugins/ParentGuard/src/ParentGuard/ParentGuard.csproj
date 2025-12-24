@@ -18,8 +18,7 @@
     <PackageReference Include="Jellyfin.Common" Version="10.10.0" />
     <PackageReference Include="Jellyfin.Controller" Version="10.10.0" />
     <PackageReference Include="Jellyfin.Model" Version="10.10.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
   </ItemGroup>
 
@@ -35,8 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Startup.cs" />
-    <Compile Remove="ServerEntryPoint.cs" />
   </ItemGroup>
 </Project>
 

@@ -3,6 +3,7 @@ C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Rel
 C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Release\net8.0\ParentGuard.AssemblyInfoInputs.cache
 C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Release\net8.0\ParentGuard.AssemblyInfo.cs
 C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Release\net8.0\ParentGuard.csproj.CoreCompileInputs.cache
+C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Release\net8.0\ParentGuard.sourcelink.json
 C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\bin\Release\net8.0\Jellyfin.Plugin.ParentGuard.deps.json
 C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\bin\Release\net8.0\Jellyfin.Plugin.ParentGuard.dll
 C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\bin\Release\net8.0\Jellyfin.Plugin.ParentGuard.pdb
@@ -10,4 +11,3 @@ C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Rel
 C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Release\net8.0\refint\Jellyfin.Plugin.ParentGuard.dll
 C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Release\net8.0\Jellyfin.Plugin.ParentGuard.pdb
 C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Release\net8.0\ref\Jellyfin.Plugin.ParentGuard.dll
-C:\dev\JellyFin-PC-KB\JellyFin-PC-KB\plugins\ParentGuard\src\ParentGuard\obj\Release\net8.0\ParentGuard.sourcelink.json

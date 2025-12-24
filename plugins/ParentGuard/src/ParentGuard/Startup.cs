@@ -1,14 +1,14 @@
-using MediaBrowser.Common.Configuration;
-using MediaBrowser.Common.Plugins;
-using MediaBrowser.Controller.Plugins;
+using System;
 using Microsoft.Extensions.DependencyInjection;
+using MediaBrowser.Controller.Plugins;
 using Jellyfin.Plugin.ParentGuard.Services;
+using MediaBrowser.Controller;
 
 namespace Jellyfin.Plugin.ParentGuard
 {
-    public class Startup : IPluginStartup
+    public class Startup : IPluginServiceRegistrator
     {
-        public void ConfigureServices(IServiceCollection services, IServerApplicationHost applicationHost)
+        public void RegisterServices(IServiceCollection services, IServerApplicationHost applicationHost)
         {
             services.AddSingleton<IPolicyService, PolicyService>();
             services.AddSingleton<IStateService, StateService>();
@@ -19,5 +19,3 @@ namespace Jellyfin.Plugin.ParentGuard
         }
     }
 }
-
-

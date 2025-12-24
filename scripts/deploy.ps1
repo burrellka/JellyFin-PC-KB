@@ -39,7 +39,7 @@ $Manifest = Get-Content $ManifestFile | ConvertFrom-Json
 $Version = $Manifest.version
 $TargetAbi = $Manifest.targetAbi
 
-$RepoJson = Get-Content $RepoJsonFile | ConvertFrom-Json
+$RepoJson = @(Get-Content $RepoJsonFile -Raw | ConvertFrom-Json)
 # Assuming single plugin in array for now
 $PluginEntry = $RepoJson[0] 
 

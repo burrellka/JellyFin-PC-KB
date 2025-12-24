@@ -5,7 +5,6 @@ using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Session;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MediaBrowser.Controller.Library;
 
 namespace Jellyfin.Plugin.ParentGuard.Services
 {

@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Server-side parental controls for Jellyfin: schedules, budgets, rate limits, appr" +
     "ovals.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("0.1.22.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.1.22+9482580cfbc2ae85516a222670e391169e09f2a7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.1.22+51ed40abcae81f9283905ddc1c7b5053f8e20e9d")]
 [assembly: System.Reflection.AssemblyProductAttribute("Jellyfin.Plugin.ParentGuard")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Jellyfin.Plugin.ParentGuard")]
 [assembly: System.Reflection.AssemblyVersionAttribute("0.1.22.0")]

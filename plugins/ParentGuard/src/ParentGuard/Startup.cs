@@ -10,6 +10,7 @@ namespace Jellyfin.Plugin.ParentGuard
     {
         public void RegisterServices(IServiceCollection services, IServerApplicationHost applicationHost)
         {
+            services.AddSingleton(Plugin.Instance!);
             services.AddSingleton<IPolicyService, PolicyService>();
             services.AddSingleton<IStateService, StateService>();
             services.AddSingleton<IEnforcementService, EnforcementService>();

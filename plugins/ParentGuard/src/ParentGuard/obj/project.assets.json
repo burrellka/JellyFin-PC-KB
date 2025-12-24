@@ -2358,7 +2358,7 @@
     "C:\\Users\\Kevin\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "0.1.21",
+    "version": "0.1.22",
     "restore": {
       "projectUniqueName": "C:\\dev\\JellyFin-PC-KB\\JellyFin-PC-KB\\plugins\\ParentGuard\\src\\ParentGuard\\ParentGuard.csproj",
       "projectName": "Jellyfin.Plugin.ParentGuard",

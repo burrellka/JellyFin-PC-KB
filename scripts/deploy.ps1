@@ -40,10 +40,17 @@ $Version = $Manifest.version
 $TargetAbi = $Manifest.targetAbi
 
 $RepoJson = @(Get-Content $RepoJsonFile -Raw | ConvertFrom-Json)
-# Assuming single plugin in array for now
-$PluginEntry = $RepoJson[0] 
+$OldPluginEntry = $RepoJson[0]
 
-# Create new version entry
+# Convert existing versions to ArrayList of HashTables to allow modification
+$VersionsList = New-Object System.Collections.Generic.List[Object]
+foreach ($v in $OldPluginEntry.versions) {
+    if ($v.version -ne $Version) {
+        $VersionsList.Add($v)
+    }
+}
+
+# Add new version at top
 $NewVersion = @{
     version   = $Version
     targetAbi = $TargetAbi
@@ -51,34 +58,33 @@ $NewVersion = @{
     checksum  = $MD5
     timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 }
+$VersionsList.Insert(0, $NewVersion)
 
-# Update versions list (replace existing if same version, or add new)
-$Versions = $PluginEntry.versions
-$ExistingIndex = -1
-for ($i = 0; $i -lt $Versions.Count; $i++) {
-    if ($Versions[$i].version -eq $Version) {
-        $ExistingIndex = $i
-        break
-    }
+# Reconstruct the plugin entry
+$NewPluginEntry = @{
+    name        = $OldPluginEntry.name
+    imageUrl    = $OldPluginEntry.imageUrl
+    overview    = $OldPluginEntry.overview
+    description = $OldPluginEntry.description
+    owner       = $OldPluginEntry.owner
+    category    = $OldPluginEntry.category
+    guid        = $OldPluginEntry.guid
+    versions    = $VersionsList
 }
 
-if ($ExistingIndex -ge 0) {
-    Write-Host "   Updating existing version $Version" -ForegroundColor Cyan
-    $Versions[$ExistingIndex] = $NewVersion
-}
-else {
-    Write-Host "   Adding new version $Version" -ForegroundColor Green
-    $Versions = , $NewVersion + $Versions
-}
+# Reconstruct the repo array
+$NewRepoArray = @($NewPluginEntry)
 
-$PluginEntry.versions = $Versions
-$RepoJson[0] = $PluginEntry
-
-# Force array output by wrapping in @()
-@($RepoJson) | ConvertTo-Json -Depth 10 | Set-Content $RepoJsonFile
+# Handle single object vs array issue with ConvertTo-Json
+$JsonOutput = $NewRepoArray | ConvertTo-Json -Depth 10
+if ($NewRepoArray.Count -eq 1 -and !$JsonOutput.StartsWith("[")) {
+    $JsonOutput = "[$JsonOutput]"
+}
+$JsonOutput | Set-Content $RepoJsonFile
 
 Write-Host "=== Deployment Prep Complete ===" -ForegroundColor Green
 Write-Host "Now run:" -ForegroundColor White
+
 Write-Host "git add ." -ForegroundColor White
 Write-Host "git commit -m 'Release v$Version'" -ForegroundColor White
 Write-Host "git push" -ForegroundColor White

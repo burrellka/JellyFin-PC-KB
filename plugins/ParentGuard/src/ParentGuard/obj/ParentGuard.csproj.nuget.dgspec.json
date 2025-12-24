@@ -5,7 +5,7 @@
   },
   "projects": {
     "C:\\dev\\JellyFin-PC-KB\\JellyFin-PC-KB\\plugins\\ParentGuard\\src\\ParentGuard\\ParentGuard.csproj": {
-      "version": "0.1.15",
+      "version": "0.1.21",
       "restore": {
         "projectUniqueName": "C:\\dev\\JellyFin-PC-KB\\JellyFin-PC-KB\\plugins\\ParentGuard\\src\\ParentGuard\\ParentGuard.csproj",
         "projectName": "Jellyfin.Plugin.ParentGuard",

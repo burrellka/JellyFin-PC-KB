@@ -26,7 +26,11 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
         public IActionResult Get()
         {
             if (_users == null) return Ok(new { items = new object[] { } });
-            var list = _users.Users.Select(u => new { id = u.Id.ToString(), name = u.Username }).ToArray();
+            var list = _users.UsersIds
+                .Select(id => _users.GetUserById(id))
+                .Where(u => u != null)
+                .Select(u => new { id = u.Id.ToString(), name = u.Username })
+                .ToArray();
             return Ok(new { items = list });
         }
     }

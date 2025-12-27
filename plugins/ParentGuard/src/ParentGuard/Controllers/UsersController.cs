@@ -27,7 +27,12 @@ namespace Jellyfin.Plugin.ParentGuard.Controllers
         {
             if (_users == null) return Ok(new { items = new object[] { } });
             var list = _users.UsersIds
-                .Select(id => _users.GetUserById(id))
+                .Select(id => 
+                {
+                    // Use dynamic to bypass ABI return type mismatch (Jellyfin.Data.Entities.User moved in 10.11)
+                    dynamic? user = ((dynamic)_users).GetUserById(id);
+                    return user;
+                })
                 .Where(u => u != null)
                 .Select(u => new { id = u.Id.ToString(), name = u.Username })
                 .ToArray();
